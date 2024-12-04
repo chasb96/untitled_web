@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-bff
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: web-bff
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: web-bff
+    spec:
+      containers:
+      - name: web-bff
+        image: public.ecr.aws/l4v6k6q7/533b1443417a97f0b6542681af7c0ed3_web_bff:latest
+        ports:
+        - containerPort: 80
