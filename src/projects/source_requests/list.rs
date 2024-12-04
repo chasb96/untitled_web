@@ -109,7 +109,7 @@ impl From<list::Completed> for CompletedSourceRequestSummary {
     }
 }
 
-pub async fn list_source_requests(
+pub async fn list(
     projects_client: ProjectsClient,
     Path(project_id): Path<String>,
 ) ->  Result<Json<ListSourceRequestsResponse>, StatusCode> {

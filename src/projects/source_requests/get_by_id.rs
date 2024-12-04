@@ -22,17 +22,17 @@ pub struct SourceRequestWrapper {
     #[serde(rename = "co")]
     pub comments: Vec<Comment>,
     #[serde(rename = "d")]
-    pub diff: HashMap<String, SourceRequestDiffItem>
+    pub diff: HashMap<String, DiffItem>
 }
 
 #[derive(Serialize)]
 pub enum SourceRequest {
     #[serde(rename = "n")]
-    New(NewSourceRequest),
+    New(New),
     #[serde(rename = "a")]
-    Approved(ApprovedSourceRequest),
+    Approved(Approved),
     #[serde(rename = "c")]
-    Completed(CompletedSourceRequest),
+    Completed(Completed),
 }
 
 impl From<get_by_id::GetByIdResponse> for SourceRequest {
@@ -54,7 +54,7 @@ pub struct FileMap {
 }
 
 #[derive(Serialize)]
-pub struct NewSourceRequest {
+pub struct New {
     #[serde(rename = "p")]
     pub project_id: String,
     #[serde(rename = "u")]
@@ -67,7 +67,7 @@ pub struct NewSourceRequest {
     pub files: Vec<FileMap>,
 }
 
-impl From<get_by_id::New> for NewSourceRequest {
+impl From<get_by_id::New> for New {
     fn from(source_request: get_by_id::New) -> Self {
         Self {
             project_id: source_request.project_id,
@@ -87,7 +87,7 @@ impl From<get_by_id::New> for NewSourceRequest {
 }
 
 #[derive(Serialize)]
-pub struct ApprovedSourceRequest {
+pub struct Approved {
     #[serde(rename = "p")]
     pub project_id: String,
     #[serde(rename = "u")]
@@ -102,7 +102,7 @@ pub struct ApprovedSourceRequest {
     pub files: Vec<FileMap>,
 }
 
-impl From<get_by_id::Approved> for ApprovedSourceRequest {
+impl From<get_by_id::Approved> for Approved {
     fn from(source_request: get_by_id::Approved) -> Self {
         Self {
             project_id: source_request.project_id,
@@ -123,7 +123,7 @@ impl From<get_by_id::Approved> for ApprovedSourceRequest {
 }
 
 #[derive(Serialize)]
-pub struct CompletedSourceRequest {
+pub struct Completed {
     #[serde(rename = "p")]
     pub project_id: String,
     #[serde(rename = "u")]
@@ -138,7 +138,7 @@ pub struct CompletedSourceRequest {
     pub files: Vec<FileMap>,
 }
 
-impl From<get_by_id::Completed> for CompletedSourceRequest {
+impl From<get_by_id::Completed> for Completed {
     fn from(source_request: get_by_id::Completed) -> Self {
         Self {
             project_id: source_request.project_id,
@@ -192,14 +192,14 @@ pub struct CommentOwner {
 }
 
 #[derive(PartialEq, Serialize)]
-pub struct SourceRequestDiffItem {
+pub struct DiffItem {
     #[serde(rename = "f")]
     pub from: String,
     #[serde(rename = "t")]
     pub to: String,
 }
 
-pub async fn get_source_request_by_id(
+pub async fn get_by_id(
     projects_client: ProjectsClient,
     users_client: UsersClient,
     Path((project_id, source_request_id)): Path<(String, String)>
@@ -261,7 +261,7 @@ pub async fn get_source_request_by_id(
         diff: diff
             .diff_items
             .into_iter()
-            .map(|(key, value)| (key, SourceRequestDiffItem {
+            .map(|(key, value)| (key, DiffItem {
                 from: value.from,
                 to: value.to,
             }))

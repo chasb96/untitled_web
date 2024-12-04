@@ -22,19 +22,19 @@ pub struct CreateCommentResponse {
     pub id: String,
 }
 
-pub async fn create_comment(
+pub async fn create(
     Authenticate(user): Authenticate<ClaimsUser>,
     projects_client: ProjectsClient,
     Path((project_id, source_request_id)): Path<(String, String)>,
     Json(request): Json<CreateCommentRequest>
 ) -> impl IntoResponse {
-    let create_comment_request = create_comment::CreateRequest {
+    let create_request = create_comment::CreateRequest {
         user_id: user.id,
         content: request.content,
     };
     
     let response = projects_client
-        .create_comment(&project_id, &source_request_id, create_comment_request)
+        .create_comment(&project_id, &source_request_id, create_request)
         .await;
 
     let source_request = match response {
@@ -43,10 +43,12 @@ pub async fn create_comment(
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    Ok((
+    let response = (
         StatusCode::CREATED,
         Json(CreateCommentResponse {
             id: source_request.id,
         })
-    ))
+    );
+
+    Ok(response)
 }

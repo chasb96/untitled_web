@@ -34,13 +34,13 @@ pub struct CreateSourceRequestResponse {
     pub id: String,
 }
 
-pub async fn create_source_request(
+pub async fn create(
     Authenticate(user): Authenticate<ClaimsUser>,
     projects_client: ProjectsClient,
     Path(project_id): Path<String>,
     Json(request): Json<CreateSourceRequestRequest>
 ) -> impl IntoResponse {
-    let create_source_request_request = create::CreateRequest {
+    let create_request = create::CreateRequest {
         user_id: user.id,
         title: request.title,
         description: request.description,
@@ -55,7 +55,7 @@ pub async fn create_source_request(
     };
 
     let response = projects_client
-        .create_source_request(&project_id, create_source_request_request)
+        .create_source_request(&project_id, create_request)
         .await;
 
     let source_request = match response {
